@@ -1,6 +1,3 @@
-from cgitb import text
-from operator import mod
-from unicodedata import name
 from django.db import models
 from django.contrib.auth.models import User
 
