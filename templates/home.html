@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            sidebar
+        </div>
+        <div class="col-md-6">
+            {% for post in posts %}
+            <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{post.name}}</h5>
+                  <p class="card-text">{{post.text}}</p>
+                  <p class="card-text"><small class="text-muted">{{post.created|timesince}} ago</small></p>
+                </div>
+              </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
