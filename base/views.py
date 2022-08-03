@@ -1,3 +1,4 @@
+from pickle import FALSE
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from base.models import comment, post, tag
@@ -5,6 +6,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from base import forms
 
 # Create your views here.
 def home(request):
@@ -64,3 +66,16 @@ def postPage(request, pk):
     
     context = {'post':post_object, 'comments': related_comments}
     return render(request, 'post.html', context)
+
+def editPost(request, pk):
+    post_object = get_object_or_404(post,id=pk)
+    form = forms.postForm(instance=post_object)
+    if request.method == 'POST':
+        form = forms.postForm(request.POST, instance=post_object)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'post updated successfully')
+        else:
+            messages.error(request, 'entries are invalid')
+    
+    return render(request, 'edit_post.html', {'form': form}) 
