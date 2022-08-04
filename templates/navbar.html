@@ -8,8 +8,12 @@
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><a href="{% url 'home' %}" class="nav-link px-2 link-secondary">Home</a></li>
           <li><a href="#" class="nav-link px-2 link-dark">Explore</a></li>
-          <li><a href="#" class="nav-link px-2 link-dark">Trends</a></li>
-          <li><a href="#" class="nav-link px-2 link-dark">Products</a></li>
+          {% if request.user.is_authenticated %}
+          <li><a href="{% url 'logout' %}" class="nav-link px-2 link-dark">logout</a></li>
+          <li><a href="{% url 'register' %}" class="nav-link px-2 link-dark">Sign up</a></li>
+          {% else %}
+          <li><a href="{% url 'login' %}" class="nav-link px-2 link-dark">login</a></li>
+          {% endif %}
         </ul>
 
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
