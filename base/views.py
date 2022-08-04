@@ -1,7 +1,8 @@
 from pickle import FALSE
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from base.models import comment, post, tag
+from base.models import comment, post, tag, profile
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -44,6 +45,8 @@ def registerPage(request):
             user = form.save(commit=False)
             user.username = user.username.lower()
             form.save()
+            user_profile = profile(related_user=user)
+            user_profile.save()
             login(request, user)
             return redirect('home')
         else:
@@ -79,3 +82,17 @@ def editPost(request, pk):
             messages.error(request, 'entries are invalid')
     
     return render(request, 'edit_post.html', {'form': form}) 
+
+def createPost(request):
+    form = forms.postForm()
+    
+    if request.method == 'POST':
+        form = forms.postForm(request.POST)
+        if form.is_valid():
+            post_object = form.save(commit=False)
+            post_object.auther = request.user
+            post_object.save()
+            messages.success(request, 'Post created successfully')
+            return redirect('post', pk=post_object.id)
+            
+    return render(request, 'edit_post.html', {'form': form})
