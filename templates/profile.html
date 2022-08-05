@@ -2,21 +2,24 @@
 
 {% block main %}
 <div class="container">
-    <div class="row">
-        <div class="col-md-3" style="padding: 12px">
-            {% for tag in tags %}
-            <a href="{% url 'tag' tag.id %}">
-                <div style="padding:3px 5px 3px 5px">
-                    {{tag.name}}
-                    <div class="badge rounded-pill bg-secondary" style="float: right;">
-                        {{tag.post_set.all.count}}
-                    </div>
-                </div>
-            </a>
-            {% endfor %}
+    <div class="text-center">
+        <div>
+            {% if profile.avatar %}
+            <img class="rounded-circle mb-3"  style="width: 150px;height: 150px;" src="{{media}}{{profile.avatar.name}}">
+            {% else %}
+            <img class="rounded-circle mb-3"  style="width: 150px;height: 150px;" src="{{media}}/avatar.png">
+            {% endif %}
         </div>
-        <div class="col-md-6">
-            <a href="{% url 'newPost' %}">Create New Post</a>
+        <div>
+            <h3>@{{user.username}}</h3>
+        </div>
+        <hr>
+        <div>
+            {% if profile.bio %}
+              {{profile.bio}}
+            {% endif %}
+        </div>
+        <div>
             {% for post in posts %}
             <a href="{% url 'post' post.id %}">
                 <div class="card">
@@ -37,6 +40,6 @@
             {% endfor %}
         </div>
     </div>
-    
 </div>
-{% endblock %}
+
+{% endblock main %}

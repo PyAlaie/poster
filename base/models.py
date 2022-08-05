@@ -1,4 +1,5 @@
 from distutils.command.upload import upload
+from email.policy import default
 from django.db import models
 from django.contrib.auth.models import User
 from django_countries.fields import CountryField
@@ -49,4 +50,4 @@ class profile(models.Model):
     birth_date = models.DateField(null=True, blank=True)
     
     def __str__(self):
-        return self.related_user
+        return self.related_user.username

@@ -1,5 +1,3 @@
-from pickle import FALSE
-import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from base.models import comment, post, tag, profile
@@ -8,12 +6,18 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from base import forms
-
+from django.conf import settings
+from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Q
 # Create your views here.
 def home(request):
-    latest_posts = post.objects.all()[:5]
-    
-    context = {'posts': latest_posts}
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    latest_posts = post.objects.filter(
+        Q(name__icontains=q)|
+        Q(auther__username__icontains=q)
+    )
+    all_tags = tag.objects.all()
+    context = {'posts': latest_posts, 'tags':all_tags}
     return render(request, 'home.html', context)
 
 def loginPage(request):
@@ -70,6 +74,7 @@ def postPage(request, pk):
     context = {'post':post_object, 'comments': related_comments}
     return render(request, 'post.html', context)
 
+@login_required(login_url='login')
 def editPost(request, pk):
     post_object = get_object_or_404(post,id=pk)
     form = forms.postForm(instance=post_object)
@@ -83,6 +88,7 @@ def editPost(request, pk):
     
     return render(request, 'edit_post.html', {'form': form}) 
 
+@login_required(login_url='login')
 def createPost(request):
     form = forms.postForm()
     
@@ -96,3 +102,22 @@ def createPost(request):
             return redirect('post', pk=post_object.id)
             
     return render(request, 'edit_post.html', {'form': form})
+
+def profilePage(request, username):
+    related_user = get_object_or_404(User, username=username)
+    profile_object = get_object_or_404(profile, related_user=related_user)
+    related_posts = related_user.post_set.all()
+    context = {'user': related_user, 'profile': profile_object, 'media': settings.MEDIA_URL, 'posts': related_posts}
+    return render(request, 'profile.html', context)
+
+@login_required(login_url='login')
+def profileEdit(request, username):
+    related_user = get_object_or_404(User, username=username)
+    profile_object = get_object_or_404(profile, related_user=related_user)
+    form = forms.profileForm(instance=profile_object)
+    if request.method == 'POST':
+        form = forms.profileForm(request.POST, instance=profile_object)
+        if form.is_valid():
+            form.save()
+    
+    return render(request, 'profile_edit.html', {'form': form})
